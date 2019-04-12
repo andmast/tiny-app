@@ -1,9 +1,18 @@
 var express = require("express");
 var app = express();
+var cookieParser = require('cookie-parser')
+app.use(cookieParser());
 var PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(function(req, res, next) {
+  console.log("Headers: ", req.headers.cookie)
+  console.log("Cookies: ", req.cookies)
+  console.log("Signed: ", req.signedCookies)
+  next()
+})
+
 
 //=================Functions================
 function generateRandomString() {
