@@ -90,7 +90,6 @@ app.get("/urls", (req,res) => {
 app.get("/urls/new", (req, res) => {
   let templateVars = {
     urls: urlDatabase,
-    username: res.cookie.username,
     user: users[res.cookie.user_id]
   };
   res.render("urls_new",templateVars);
@@ -146,20 +145,23 @@ app.post("/login", (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
   console.log("check",check)
+
+
 ///----------Checking password------------------
   if (check === undefined){
     return res.status(403).send("Not registered");
   } else if (check.email === email && check.password === password) {
-    res.cookie('user_id', check.id)
-    console.log("email",check.email,"password",check.password);
-    res.redirect("/urls");
+    res.cookie("user_id", check.id)
+    console.log(check.id);
+    res.cookie.user_id = check.id;
+    return res.redirect("urls");
   } else if (check.mail !== req.body.mail){
     res.status(400).send("No account registered. Please register");
   } else if (check.password !== req.body.password){
     res.status(400).send("wrong password");
   }
 //------------------------------------------------
-  res.redirect('/urls')
+  res.redirect("/urls")
 });
 
 app.post("/register",(req,res) => {
