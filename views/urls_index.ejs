@@ -11,10 +11,9 @@
 </head>
 <body style="font-size:20px; padding:50px;">
    <% include ./partials/_header %>
-    <h2>ShortUrls: <%=Object.keys(urls)%> </h2>
 <ul>
     <% for(x in urls) { %>
-        <li><a href=""><%= x %></a>:<%= urls[x] %></li>
+        <li><a href="/u/<%= x %>"><%= x %></a>:<%= urls[x] %></li>
     <% }; %>
 </ul>
 </body>
