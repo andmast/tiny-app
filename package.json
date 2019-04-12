@@ -1,0 +1,19 @@
+{
+  "name": "tiny-app",
+  "version": "1.0.0",
+  "description": "tiny app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andmast/tiny-app.git"
+  },
+  "author": "Andrea Mastrantoni",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/andmast/tiny-app/issues"
+  },
+  "homepage": "https://github.com/andmast/tiny-app#readme"
+}
