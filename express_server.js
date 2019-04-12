@@ -59,6 +59,11 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${random}`);
 });
 
+app.post("/urls/:id/delete", (req, res) => {
+  delete urlDatabase[req.params.id];
+  res.redirect("/urls");
+});
+
 //^^^^^^^^^^^^^^^^^^^Posts^^^^^^^^^^^^^^^^^^^^^^
 
 
