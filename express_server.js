@@ -130,7 +130,6 @@ app.post("/urls", (req, res) => {
 
 app.post("/urls/:id", (req, res) => {
   console.log("post",req.body,req.params)
-  console.log(findEmail(email).key)
   urlDatabase[req.params.id]= req.body.longURL;
   res.redirect("/urls");
 });
