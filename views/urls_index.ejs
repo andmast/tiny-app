@@ -13,7 +13,7 @@
    <% include ./partials/_header %>
 <ul>
     <% for(x in urls) { %>
-        <li><a href="/u/<%= x %>"><%= x %></a>:<%= urls[x] %>
+        <li><a href="/u/<%= x %>"><%= x %></a>:<%= urls[x] %><a href="/urls/<%= x%>">  Edit</a>
           <form method="POST" action="/urls/<%= x %>/delete"><button>Delete</button>
           </form>
 
