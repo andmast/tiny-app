@@ -28,6 +28,15 @@ function findEmail(email) {
     }
   }
 };
+function findEmail(email) {
+  for(key in users){
+    let check = users[key].email
+    if(check === email){
+      check = users[key];
+      return check
+    }
+  }
+};
 
 
 //^^^^^^^^^^^^^^^^^Functions^^^^^^^^^^^^^^^^
@@ -126,6 +135,7 @@ app.post("/urls", (req, res) => {
 
 app.post("/urls/:id", (req, res) => {
   console.log("post",req.body,req.params)
+  console.log(findEmail(email).key)
   urlDatabase[req.params.id]= req.body.longURL;
   res.redirect("/urls");
 });
@@ -136,8 +146,23 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  res.cookie.username = req.body.username;
-  console.log(res.cookie);
+  let check = findEmail(req.body.email)
+  let email = req.body.email;
+  let password = req.body.password;
+  console.log("check",check)
+///----------Checking password------------------
+  if (check === undefined){
+    return res.status(403).send("Not registered");
+  } else if (check.email === email && check.password === password) {
+    res.cookie('user_id', check.id)
+    console.log("email",check.email,"password",check.password);
+    res.redirect("/urls");
+  } else if (check.mail !== req.body.mail){
+    res.status(400).send("No account registered. Please register");
+  } else if (check.password !== req.body.password){
+    res.status(400).send("wrong password");
+  }
+//------------------------------------------------
   res.redirect('/urls')
 });
 
@@ -145,22 +170,26 @@ app.post("/register",(req,res) => {
   let email = req.body.email;
   let password = req.body.password;
   let userRandomID = generateRandomString();
+//===============Checking Register============
   if(email === "" || password === ""){
-    res.status(400).send("Empty Input Feilds");
+    return res.status(400).send("Empty Input Feilds");
   }
-  if(findEmail(email)){
-    res.status(400).send("Email already registered");
+  if(findEmail(email) === undefined){
+    return res.status(400).send("Email already registered");
+  } else {
+    users[userRandomID] = {
+      id: userRandomID,
+      email: email,
+      password: password,
+    }
+    console.log(users[userRandomID]);
+    res.cookie.user_id = userRandomID;
+    console.log(users[res.cookie.user_id]);
+    res.redirect("/urls");
   }
+//==============================================
 
-  users[userRandomID] = {
-    id: userRandomID,
-    email: email,
-    password: password,
-  }
-  console.log(users[userRandomID]);
-  res.cookie.user_id = userRandomID;
-  console.log(users[res.cookie.user_id]);
-  res.redirect("/urls");
+
 });
 
 //^^^^^^^^^^^^^^^^^^^Posts^^^^^^^^^^^^^^^^^^^^^^
