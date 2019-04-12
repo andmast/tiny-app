@@ -7,9 +7,9 @@ app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(function(req, res, next) {
-  console.log("Headers: ", req.headers.cookie)
-  console.log("Cookies: ", req.cookies.user_id)
-  console.log("Signed: ", req.signedCookies)
+  console.log("Headers: ", req.headers.cookie);
+  console.log("Cookies: ", req.cookies.user_id);
+  console.log("Signed: ", req.signedCookies);
   next()
 })
 
@@ -18,6 +18,17 @@ app.use(function(req, res, next) {
 function generateRandomString() {
    return Math.random().toString(36).substring(2,8)
 };
+
+function findEmail(email) {
+  for(key in users){
+    let check = users[key].email
+    if(check === email){
+      console.log(check)
+      return users[key].email
+    }
+  }
+};
+
 
 //^^^^^^^^^^^^^^^^^Functions^^^^^^^^^^^^^^^^
 
@@ -110,15 +121,25 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/register",(req,res) => {
+  let email = req.body.email;
+  let password = req.body.password;
   let userRandomID = generateRandomString();
+  if(email === "" || password === ""){
+    res.status(400).send("Empty Input Feilds");
+  }
+  if(findEmail(email)){
+    res.status(400).send("Email already registered");
+  }
+
   users[userRandomID] = {
     id: userRandomID,
-    email: req.body.email,
-    password: req.body.password,
+    email: email,
+    password: password,
   }
   console.log(users[userRandomID]);
   res.cookie.user_id = userRandomID;
-  console.log(res.cookie.user_id);
+  console.log(users[res.cookie.user_id]);
+  res.redirect("/urls");
 });
 
 //^^^^^^^^^^^^^^^^^^^Posts^^^^^^^^^^^^^^^^^^^^^^
