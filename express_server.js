@@ -8,7 +8,7 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(function(req, res, next) {
   console.log("Headers: ", req.headers.cookie)
-  console.log("Cookies: ", req.cookies)
+  console.log("Cookies: ", req.cookies.user_id)
   console.log("Signed: ", req.signedCookies)
   next()
 })
@@ -39,16 +39,19 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req,res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = { urls: urlDatabase,
+  username: res.cookie.username };
   res.render("urls_index", templateVars)
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = {username: res.cookie.username};
+  res.render("urls_new",templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id] };
+  let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id],
+  username: res.cookie.username };
   res.render("urls_show", templateVars);
 });
 app.get("/u/:shortURL", (req, res) => {
@@ -59,6 +62,8 @@ app.get("/u/:shortURL", (req, res) => {
 //^^^^^^^^^^^^^^^^^^^Gets^^^^^^^^^^^^^^^^^^^^^^^
 
 //+++++++++++++++++++Posts++++++++++++++++++++++
+
+
 app.post("/urls", (req, res) => {
   let random = generateRandomString()
   let longURL = req.body.longURL;
@@ -79,6 +84,11 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls");
 });
 
+app.post("/login", (req, res) => {
+  res.cookie.username = req.body.username;
+  console.log(res.cookie);
+  res.redirect('/urls')
+});
 
 
 //^^^^^^^^^^^^^^^^^^^Posts^^^^^^^^^^^^^^^^^^^^^^
