@@ -64,24 +64,45 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  let templateVars = {username: res.cookie.username}
+  let templateVars = {
+    username: res.cookie.username,
+    user: users[res.cookie.user_id],
+  }
   res.render("registration",templateVars);
 });
 
+app.get("/login", (req, res) => {
+  let templateVars = {
+    username: res.cookie.username,
+    user: users[res.cookie.user_id],
+  }
+  res.render("login",templateVars);
+});
 app.get("/urls", (req,res) => {
-  let templateVars = { urls: urlDatabase,
-  username: res.cookie.username };
+  let templateVars = {
+    urls: urlDatabase,
+    username: res.cookie.username,
+    user: users[res.cookie.user_id]
+  };
   res.render("urls_index", templateVars)
 });
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = {username: res.cookie.username};
+  let templateVars = {
+    urls: urlDatabase,
+    username: res.cookie.username,
+    user: users[res.cookie.user_id]
+  };
   res.render("urls_new",templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id],
-  username: res.cookie.username };
+  let templateVars = {
+    shortURL: req.params.id,
+    longURL: urlDatabase[req.params.id],
+    username: res.cookie.username,
+    user: users[res.cookie.user_id]
+  };
   res.render("urls_show", templateVars);
 });
 app.get("/u/:shortURL", (req, res) => {

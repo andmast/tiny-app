@@ -2,12 +2,11 @@
   <h1>Tiny App</h1>
   <a href="/urls/new">Create New Tiny Url</a> |
   <a href="/urls">Urls</a>
-  <% if (username){%>
-  <h4>Logged in as <%= username %></h4>
+  <% if (user){%>
+  <h4>Logged in as <%= user.email %></h4>
   <% } else { %>
-  <form action="/login" method="POST">
-    <input type="text" name="username">
-    <button>Submit</button>
-  </form>
+  |<a href="/urls/new"> Login</a> |
+  <a href="/urls">Register</a>
+
   <% } %>
 </header>
