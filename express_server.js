@@ -23,15 +23,6 @@ function findEmail(email) {
   for(key in users){
     let check = users[key].email
     if(check === email){
-      console.log(check)
-      return users[key].email
-    }
-  }
-};
-function findEmail(email) {
-  for(key in users){
-    let check = users[key].email
-    if(check === email){
       check = users[key];
       return check
     }
@@ -121,6 +112,11 @@ app.get("/u/:shortURL", (req, res) => {
 
 //^^^^^^^^^^^^^^^^^^^Gets^^^^^^^^^^^^^^^^^^^^^^^
 
+
+
+
+
+
 //+++++++++++++++++++Posts++++++++++++++++++++++
 
 
@@ -170,13 +166,19 @@ app.post("/register",(req,res) => {
   let email = req.body.email;
   let password = req.body.password;
   let userRandomID = generateRandomString();
+  let check = findEmail(email);
+
+
+
 //===============Checking Register============
   if(email === "" || password === ""){
     return res.status(400).send("Empty Input Feilds");
   }
-  if(findEmail(email) === undefined){
+  console.log("check",check);
+  if( check !== undefined){
     return res.status(400).send("Email already registered");
-  } else {
+  }
+  if (check === undefined){
     users[userRandomID] = {
       id: userRandomID,
       email: email,
@@ -187,6 +189,7 @@ app.post("/register",(req,res) => {
     console.log(users[res.cookie.user_id]);
     res.redirect("/urls");
   }
+
 //==============================================
 
 
