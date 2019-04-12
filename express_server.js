@@ -59,10 +59,18 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${random}`);
 });
 
+app.post("/urls/:id", (req, res) => {
+  console.log("post",req.body,req.params)
+  urlDatabase[req.params.id]= req.body.longURL;
+  res.redirect("/urls");
+});
+
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id];
   res.redirect("/urls");
 });
+
+
 
 //^^^^^^^^^^^^^^^^^^^Posts^^^^^^^^^^^^^^^^^^^^^^
 

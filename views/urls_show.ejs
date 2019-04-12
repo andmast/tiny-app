@@ -10,7 +10,9 @@
 </head>
 <body style="font-size:20px; padding:50px;">
    <% include ./partials/_header %>
-    <h1>Short: <%=shortURL%> </h1>
-    <p> <a href = "/u/<%=shortURL%>" ><%=longURL%><a> </p>
+    <h1>ShortURL: <%=shortURL%> </h1>
+    <form action="/urls/<%= shortURL%>" method="POST"><input type="text" name="longURL" placeholder="<%= longURL%>" value="<%= longURL%>"><button>Update</button>
+
+    </form>
 </body>
 </html>
