@@ -21,10 +21,28 @@ function generateRandomString() {
 
 //^^^^^^^^^^^^^^^^^Functions^^^^^^^^^^^^^^^^
 
+//################Variables##################
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+}
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+//^^^^^^^^^^^^^^^^^^Variables^^^^^^^^^^^^^^^^^^
+
+
+
 
 //------------GETS----------------------
 app.get("/", (req, res) => {
@@ -34,8 +52,9 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
+app.get("/register", (req, res) => {
+  let templateVars = {username: res.cookie.username}
+  res.render("registration",templateVars);
 });
 
 app.get("/urls", (req,res) => {
@@ -90,6 +109,17 @@ app.post("/login", (req, res) => {
   res.redirect('/urls')
 });
 
+app.post("/register",(req,res) => {
+  let userRandomID = generateRandomString();
+  users[userRandomID] = {
+    id: userRandomID,
+    email: req.body.email,
+    password: req.body.password,
+  }
+  console.log(users[userRandomID]);
+  res.cookie.user_id = userRandomID;
+  console.log(res.cookie.user_id);
+});
 
 //^^^^^^^^^^^^^^^^^^^Posts^^^^^^^^^^^^^^^^^^^^^^
 
