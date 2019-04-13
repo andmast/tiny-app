@@ -29,8 +29,20 @@ function findEmail(email) {
   }
 };
 
-function urlsForUser(id){
+const urlDatabase = {
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "userRandomID" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "userRandomID" }
+};
 
+
+function urlsForUser(id){
+  let urls = {};
+  for(key in urlDatabase){
+    if(urlDatabase[key].userID === id){
+      urls[key] = urlDatabase[key].longURL
+    }
+  }
+  return urls;
 };
 
 function notLoggedIn(cookie){
@@ -59,10 +71,6 @@ const users = {
     password: "dishwasher-funk"
   }
 }
-const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "userRandomID" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "userRandomID" }
-};
 
 //^^^^^^^^^^^^^^^^^^Variables^^^^^^^^^^^^^^^^^^
 
