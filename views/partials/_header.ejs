@@ -6,7 +6,10 @@
   <% } else { %>
   <h4>Logged in as <%= user.email %></h4>
    <a href="/urls/new">Create New Tiny Url</a> |
-  <a href="/urls">Urls</a>
+  <a href="/urls">Urls</a> |
+  <form method="POST" action= "/logout">
+    <button>Logout</button>
+  </form>
 
   <% } %>
 </header>

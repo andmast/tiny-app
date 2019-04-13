@@ -29,6 +29,20 @@ function findEmail(email) {
   }
 };
 
+function findUrldatabase(user_id){
+
+};
+
+function isLoggedIn(cookie){
+  for(key in users){
+    let check = cookie
+    if(check === key){
+      return false;
+    } else {
+      return true;
+    }
+  }
+}
 
 //^^^^^^^^^^^^^^^^^Functions^^^^^^^^^^^^^^^^
 
@@ -45,13 +59,9 @@ const users = {
     password: "dishwasher-funk"
   }
 }
-var urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
 const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "userRandomID" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "userRandomID" }
 };
 
 //^^^^^^^^^^^^^^^^^^Variables^^^^^^^^^^^^^^^^^^
@@ -69,7 +79,6 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/register", (req, res) => {
   let templateVars = {
-    username: res.cookie.username,
     user: users[res.cookie.user_id],
   }
   res.render("registration",templateVars);
@@ -77,7 +86,6 @@ app.get("/register", (req, res) => {
 
 app.get("/login", (req, res) => {
   let templateVars = {
-    username: res.cookie.username,
     user: users[res.cookie.user_id],
   }
   res.render("login",templateVars);
@@ -85,13 +93,17 @@ app.get("/login", (req, res) => {
 app.get("/urls", (req,res) => {
   let templateVars = {
     urls: urlDatabase,
-    username: res.cookie.username,
     user: users[res.cookie.user_id]
   };
   res.render("urls_index", templateVars)
 });
 
 app.get("/urls/new", (req, res) => {
+  console.log(res.cookie.user_id)
+  console.log(isLoggedIn(res.cookie.user_id))
+  if (isLoggedIn(res.cookie.user_id)){
+    console.log("not logged@#@#$#$@#$@#$@#%@",true)
+  }
   let templateVars = {
     urls: urlDatabase,
     user: users[res.cookie.user_id]
@@ -103,7 +115,6 @@ app.get("/urls/:id", (req, res) => {
   let templateVars = {
     shortURL: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: res.cookie.username,
     user: users[res.cookie.user_id]
   };
   res.render("urls_show", templateVars);
@@ -148,9 +159,7 @@ app.post("/login", (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
   console.log("check",check)
-
-
-///----------Checking password------------------
+//----------Checking password------------------
   if (check === undefined){
     return res.status(403).send("Not registered");
   } else if (check.email === email && check.password === password) {
@@ -167,14 +176,18 @@ app.post("/login", (req, res) => {
   res.redirect("/urls")
 });
 
+app.post("/logout",(req,res) => {
+  console.log(res.cookie);
+  res.clearCookie('user',"user_id");
+  console.log(res.cookie.user_id);
+  res.redirect("/login");
+});
+
 app.post("/register",(req,res) => {
   let email = req.body.email;
   let password = req.body.password;
   let userRandomID = generateRandomString();
   let check = findEmail(email);
-
-
-
 //===============Checking Register============
   if(email === "" || password === ""){
     return res.status(400).send("Empty Input Feilds");
@@ -194,11 +207,9 @@ app.post("/register",(req,res) => {
     console.log(users[res.cookie.user_id]);
     res.redirect("/urls");
   }
-
 //==============================================
-
-
 });
+
 
 //^^^^^^^^^^^^^^^^^^^Posts^^^^^^^^^^^^^^^^^^^^^^
 
