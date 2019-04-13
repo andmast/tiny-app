@@ -86,8 +86,8 @@ app.get("/register", (req, res) => {
 
 app.get("/login", (req, res) => {
   let templateVars = {
-    user: users[res.cookie.user_id],
-  }
+    user: undefined
+  };
   res.render("login",templateVars);
 });
 app.get("/urls", (req,res) => {
