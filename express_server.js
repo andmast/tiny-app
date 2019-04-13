@@ -1,19 +1,25 @@
 var express = require("express");
 var app = express();
+//---------------------------------------------
 var cookieParser = require('cookie-parser')
 app.use(cookieParser());
+//----------------------------------------
 var PORT = 8080; // default port 8080
+//----------------------------------------
 app.set("view engine", "ejs");
+//---------------------------------------
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
+//--------------------------------------------
 app.use(function(req, res, next) {
   console.log("Headers: ", req.headers.cookie);
   console.log("Cookies: ", req.cookies.user_id);
   console.log("Signed: ", req.signedCookies);
   next()
 })
-
-
+//---------------------------------------------
+const bcrypt = require('bcrypt');
+//-------------------------------------------
 //=================Functions================
 function generateRandomString() {
    return Math.random().toString(36).substring(2,8)
@@ -61,12 +67,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    hashedPassword: "purple-monkey-dinosaur"
   },
  "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    hashedPassword: "dishwasher-funk"
   }
 }
 const urlDatabase = {
@@ -191,13 +197,13 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.post("/login", (req, res) => {
   let check = findEmail(req.body.email)
-  let email = req.body.email;
-  let password = req.body.password;
-  console.log("check",check)
+  let hashedPassword = bcrypt.hashSync(req.body.password, 10);
+  console.log("check",check,"#", hashedPassword)
+  console.log(bcrypt.compareSync(hashedPassword, check.hashedPassword))
 //----------Checking password------------------
   if (check === undefined){
     return res.status(403).send("Not registered");
-  } else if (check.email === email && check.password === password) {
+  } else if (check.email === req.body.email && bcrypt.compareSync(hashedPassword, check.hashedPassword)) {
     res.cookie("user_id", check.id)
     console.log(check.id);
     res.cookie.user_id = check.id;
@@ -217,22 +223,21 @@ app.post("/logout",(req,res) => {
 });
 
 app.post("/register",(req,res) => {
-  let email = req.body.email;
-  let password = req.body.password;
+  let hashedPassword = bcrypt.hashSync(req.body.password, 10)
   let userRandomID = generateRandomString();
-  let check = findEmail(email);
+  let check = findEmail(req.body.email);
 //===============Checking Register============
-  if(email === "" || password === ""){
+  if(req.body.email === "" || req.body.password === ""){
     return res.status(400).send("Empty Input Feilds");
   } else  if( check !== undefined){
     return res.status(400).send("Email already registered");
   } else if (check === undefined) {
     users[userRandomID] = {
       id: userRandomID,
-      email: email,
-      password: password,
+      email: req.body.email,
+      hashedPassword: hashedPassword,
     }
-    console.log(users[userRandomID]);
+    console.log("reg", users[userRandomID]);
     res.cookie.user_id = userRandomID;
     console.log(res.cookie.user_id);
     res.redirect("/urls");
