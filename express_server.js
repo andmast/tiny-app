@@ -29,13 +29,13 @@ function findEmail(email) {
   }
 };
 
-function findUrldatabase(user_id){
+function urlsForUser(id){
 
 };
 
-function isLoggedIn(cookie){
+function notLoggedIn(cookie){
   for(key in users){
-    let check = cookie
+    let check = cookie;
     if(check === key){
       return false;
     } else {
@@ -71,7 +71,12 @@ const urlDatabase = {
 
 //------------GETS----------------------
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  console.log(notLoggedIn(res.cookie.user_id))
+  if (notLoggedIn(res.cookie.user_id)){
+    res.redirect("/login");
+  } else {
+    res.redirect("/urls")
+  }
 });
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
@@ -91,6 +96,10 @@ app.get("/login", (req, res) => {
   res.render("login",templateVars);
 });
 app.get("/urls", (req,res) => {
+  console.log(notLoggedIn(res.cookie.user_id))
+  if (notLoggedIn(res.cookie.user_id)){
+    res.redirect("/login");
+  }
   let templateVars = {
     urls: urlDatabase,
     user: users[res.cookie.user_id]
@@ -99,10 +108,9 @@ app.get("/urls", (req,res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  console.log(res.cookie.user_id)
-  console.log(isLoggedIn(res.cookie.user_id))
-  if (isLoggedIn(res.cookie.user_id)){
-    console.log("not logged@#@#$#$@#$@#$@#%@",true)
+  console.log(notLoggedIn(res.cookie.user_id))
+  if (notLoggedIn(res.cookie.user_id)){
+    res.redirect("/login");
   }
   let templateVars = {
     urls: urlDatabase,
@@ -112,6 +120,10 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
+  console.log(notLoggedIn(res.cookie.user_id))
+  if (notLoggedIn(res.cookie.user_id)){
+    res.redirect("/login");
+  }
   let templateVars = {
     shortURL: req.params.id,
     longURL: urlDatabase[req.params.id],
@@ -119,6 +131,7 @@ app.get("/urls/:id", (req, res) => {
   };
   res.render("urls_show", templateVars);
 });
+
 app.get("/u/:shortURL", (req, res) => {
    const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
@@ -177,9 +190,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout",(req,res) => {
-  console.log(res.cookie);
-  res.clearCookie('user',"user_id");
-  console.log(res.cookie.user_id);
+  res.clearCookie("user_id");
   res.redirect("/login");
 });
 
