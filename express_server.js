@@ -45,6 +45,7 @@ function urlsForUser(id){
 function notLoggedIn(cookie){
   for(key in users){
     let check = cookie;
+    console.log("check", check, "key", key, "cookie", cookie)
     if(check === key){
       return false;
     } else {
@@ -93,7 +94,7 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/register", (req, res) => {
   let templateVars = {
-    user: users[res.cookie.user_id],
+    user: undefined,
   }
   res.render("registration",templateVars);
 });
@@ -106,10 +107,11 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/urls", (req,res) => {
-  console.log(notLoggedIn(res.cookie.user_id))
-  if (notLoggedIn(res.cookie.user_id)){
-    res.redirect("/login");
-  }
+  // console.log("not logged In",notLoggedIn(res.cookie.user_id))
+  // if (notLoggedIn(res.cookie.user_id)){
+  //   res.redirect("/login");
+  // }
+
   let templateVars = {
     urls: urlsForUser(res.cookie.user_id),
     user: users[res.cookie.user_id]
@@ -119,10 +121,10 @@ app.get("/urls", (req,res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  console.log(notLoggedIn(res.cookie.user_id))
-  if (notLoggedIn(res.cookie.user_id)){
-    res.redirect("/login");
-  }
+  // console.log("here",notLoggedIn(req.headers.user_id))
+  // if (notLoggedIn(res.cookie.user_id)){
+  //   res.redirect("/login");
+  // }
   let templateVars = {
     urls: urlDatabase,
     user: users[res.cookie.user_id]
@@ -131,10 +133,10 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  console.log(notLoggedIn(res.cookie.user_id))
-  if (notLoggedIn(res.cookie.user_id)){
-    res.redirect("/login");
-  }
+  // console.log(notLoggedIn(res.cookie.user_id))
+  // if (notLoggedIn(res.cookie.user_id)){
+  //   res.redirect("/login");
+  // }
   let templateVars = {
     shortURL: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
@@ -222,12 +224,9 @@ app.post("/register",(req,res) => {
 //===============Checking Register============
   if(email === "" || password === ""){
     return res.status(400).send("Empty Input Feilds");
-  }
-  console.log("check",check);
-  if( check !== undefined){
+  } else  if( check !== undefined){
     return res.status(400).send("Email already registered");
-  }
-  if (check === undefined){
+  } else if (check === undefined) {
     users[userRandomID] = {
       id: userRandomID,
       email: email,
@@ -235,7 +234,7 @@ app.post("/register",(req,res) => {
     }
     console.log(users[userRandomID]);
     res.cookie.user_id = userRandomID;
-    console.log(users[res.cookie.user_id]);
+    console.log(res.cookie.user_id);
     res.redirect("/urls");
   }
 //==============================================
