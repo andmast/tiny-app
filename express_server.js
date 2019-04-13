@@ -29,10 +29,7 @@ function findEmail(email) {
   }
 };
 
-const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "userRandomID" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "userRandomID" }
-};
+
 
 
 function urlsForUser(id){
@@ -71,6 +68,10 @@ const users = {
     password: "dishwasher-funk"
   }
 }
+const urlDatabase = {
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "userRandomID" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "userRandomID" }
+};
 
 //^^^^^^^^^^^^^^^^^^Variables^^^^^^^^^^^^^^^^^^
 
@@ -103,15 +104,17 @@ app.get("/login", (req, res) => {
   };
   res.render("login",templateVars);
 });
+
 app.get("/urls", (req,res) => {
   console.log(notLoggedIn(res.cookie.user_id))
   if (notLoggedIn(res.cookie.user_id)){
     res.redirect("/login");
   }
   let templateVars = {
-    urls: urlDatabase,
+    urls: urlsForUser(res.cookie.user_id),
     user: users[res.cookie.user_id]
   };
+
   res.render("urls_index", templateVars)
 });
 
@@ -134,9 +137,10 @@ app.get("/urls/:id", (req, res) => {
   }
   let templateVars = {
     shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
     user: users[res.cookie.user_id]
   };
+  console.log("HEREREERE$$$$$$", templateVars)
   res.render("urls_show", templateVars);
 });
 
@@ -159,14 +163,21 @@ app.post("/urls", (req, res) => {
   let random = generateRandomString()
   let longURL = req.body.longURL;
   console.log("long",longURL);
-  urlDatabase[random] = longURL;
+  urlDatabase[random] = {
+    longURL: longURL,
+    userID: res.cookie.user_id
+  }
   console.log(urlDatabase);
   res.redirect(`/urls/${random}`);
 });
 
 app.post("/urls/:id", (req, res) => {
   console.log("post",req.body,req.params)
-  urlDatabase[req.params.id]= req.body.longURL;
+  urlDatabase[req.params.id]= {
+    longURL: req.body.longURL,
+    userID: res.cookie.user_id
+  };
+  console.log(urlDatabase);
   res.redirect("/urls");
 });
 
