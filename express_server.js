@@ -67,12 +67,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    hashedPassword: "purple-monkey-dinosaur"
+    hashedPassword: bcrypt.hashSync("purple-monkey-dinosaur", 10)
   },
  "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    hashedPassword: "dishwasher-funk"
+    hashedPassword: bcrypt.hashSync("dishwasher-funk", 10)
   }
 }
 const urlDatabase = {
@@ -87,37 +87,43 @@ const urlDatabase = {
 
 //------------GETS----------------------
 app.get("/", (req, res) => {
-  console.log(notLoggedIn(res.cookie.user_id))
-  if (notLoggedIn(res.cookie.user_id)){
-    res.redirect("/login");
-  } else {
+  console.log("Coookie check /", res.cookie)
+  if (!res.cookie){
     res.redirect("/urls")
+  } else {
+    res.redirect("/login");
   }
-});
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
 });
 
 app.get("/register", (req, res) => {
-  let templateVars = {
+  console.log("Coookie check /register", res.cookie)
+  if(!res.cookie) {
+    let templateVars = {
     user: undefined,
   }
   res.render("registration",templateVars);
+} else {
+  res.redirect("/urls")
+}
+
 });
 
 app.get("/login", (req, res) => {
-  let templateVars = {
+  console.log("Coookie check /login", res.cookie.user_id);
+  if(!res.cookie){
+    console.log("Coookie check /login IF");
+    let templateVars = {
     user: undefined
   };
   res.render("login",templateVars);
+  } else {
+    res.redirect("/urls")
+  }
+
 });
 
 app.get("/urls", (req,res) => {
-  // console.log("not logged In",notLoggedIn(res.cookie.user_id))
-  // if (notLoggedIn(res.cookie.user_id)){
-  //   res.redirect("/login");
-  // }
-
+  console.log("Coookie check/urls", res.cookie)
   let templateVars = {
     urls: urlsForUser(res.cookie.user_id),
     user: users[res.cookie.user_id]
@@ -127,10 +133,7 @@ app.get("/urls", (req,res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  // console.log("here",notLoggedIn(req.headers.user_id))
-  // if (notLoggedIn(res.cookie.user_id)){
-  //   res.redirect("/login");
-  // }
+  console.log("Coookie check/urls/new", res.cookie.user_id)
   let templateVars = {
     urls: urlDatabase,
     user: users[res.cookie.user_id]
@@ -139,16 +142,12 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  // console.log(notLoggedIn(res.cookie.user_id))
-  // if (notLoggedIn(res.cookie.user_id)){
-  //   res.redirect("/login");
-  // }
+  console.log("Coookie check", res.cookie.user_id)
   let templateVars = {
     shortURL: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
     user: users[res.cookie.user_id]
   };
-  console.log("HEREREERE$$$$$$", templateVars)
   res.render("urls_show", templateVars);
 });
 
@@ -216,7 +215,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout",(req,res) => {
-  res.clearCookie("user_id");
+  res.clearCookie("user_id", null);
   res.redirect("/login");
 });
 
@@ -249,12 +248,3 @@ app.post("/register",(req,res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-
-
-
-
-
-
-
-
