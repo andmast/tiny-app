@@ -87,43 +87,32 @@ const urlDatabase = {
 
 //------------GETS----------------------
 app.get("/", (req, res) => {
-  console.log("Coookie check /", res.cookie)
-  if (!res.cookie){
-    res.redirect("/urls")
-  } else {
+  console.log("Coookie check", res.cookie.user_id)
+  if (notLoggedIn(res.cookie.user_id)){
     res.redirect("/login");
+  } else {
+    res.redirect("/urls")
   }
 });
 
 app.get("/register", (req, res) => {
-  console.log("Coookie check /register", res.cookie)
-  if(!res.cookie) {
-    let templateVars = {
+  console.log("Coookie check", res.cookie.user_id)
+  let templateVars = {
     user: undefined,
   }
   res.render("registration",templateVars);
-} else {
-  res.redirect("/urls")
-}
-
 });
 
 app.get("/login", (req, res) => {
-  console.log("Coookie check /login", res.cookie.user_id);
-  if(!res.cookie){
-    console.log("Coookie check /login IF");
-    let templateVars = {
+  console.log("Coookie check", res.cookie.user_id)
+  let templateVars = {
     user: undefined
   };
   res.render("login",templateVars);
-  } else {
-    res.redirect("/urls")
-  }
-
 });
 
 app.get("/urls", (req,res) => {
-  console.log("Coookie check/urls", res.cookie)
+  console.log("Coookie check/urls", res.cookie.user_id)
   let templateVars = {
     urls: urlsForUser(res.cookie.user_id),
     user: users[res.cookie.user_id]
@@ -215,7 +204,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout",(req,res) => {
-  res.clearCookie("user_id", null);
+  res.clearCookie("user_id");
   res.redirect("/login");
 });
 
