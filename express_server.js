@@ -10,6 +10,12 @@ app.set("view engine", "ejs");
 //---------------------------------------
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
+
+var cookieSession = require('cookie-session')
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1']
+}));
 //--------------------------------------------
 app.use(function(req, res, next) {
   console.log("Headers: ", req.headers.cookie);
@@ -20,6 +26,8 @@ app.use(function(req, res, next) {
 //---------------------------------------------
 const bcrypt = require('bcrypt');
 //-------------------------------------------
+
+
 //=================Functions================
 function generateRandomString() {
    return Math.random().toString(36).substring(2,8)
@@ -87,8 +95,8 @@ const urlDatabase = {
 
 //------------GETS----------------------
 app.get("/", (req, res) => {
-  console.log("Coookie check", res.cookie.user_id)
-  if (notLoggedIn(res.cookie.user_id)){
+  console.log("Coookie check", req.session.user_id)
+  if (!req.session.user_id){
     res.redirect("/login");
   } else {
     res.redirect("/urls")
@@ -96,7 +104,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  console.log("Coookie check", res.cookie.user_id)
+  console.log("Coookie check", req.session.user_id)
   let templateVars = {
     user: undefined,
   }
@@ -104,7 +112,7 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  console.log("Coookie check", res.cookie.user_id)
+  console.log("Coookie check", req.session.user_id)
   let templateVars = {
     user: undefined
   };
@@ -112,30 +120,30 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/urls", (req,res) => {
-  console.log("Coookie check/urls", res.cookie.user_id)
+  console.log("Coookie check/urls", req.session.user_id)
   let templateVars = {
-    urls: urlsForUser(res.cookie.user_id),
-    user: users[res.cookie.user_id]
+    urls: urlsForUser(req.session.user_id),
+    user: users[req.session.user_id]
   };
 
   res.render("urls_index", templateVars)
 });
 
 app.get("/urls/new", (req, res) => {
-  console.log("Coookie check/urls/new", res.cookie.user_id)
+  console.log("Coookie check/urls/new", req.session.user_id)
   let templateVars = {
     urls: urlDatabase,
-    user: users[res.cookie.user_id]
+    user: users[req.session.user_id]
   };
   res.render("urls_new",templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
-  console.log("Coookie check", res.cookie.user_id)
+  console.log("Coookie check", req.session.user_id)
   let templateVars = {
     shortURL: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
-    user: users[res.cookie.user_id]
+    user: users[req.session.user_id]
   };
   res.render("urls_show", templateVars);
 });
@@ -162,7 +170,7 @@ app.post("/urls", (req, res) => {
   console.log("long",longURL);
   urlDatabase[random] = {
     longURL: longURL,
-    userID: res.cookie.user_id
+    userID: req.session.user_id
   }
   console.log(urlDatabase);
   res.redirect(`/urls/${random}`);
@@ -172,7 +180,7 @@ app.post("/urls/:id", (req, res) => {
   console.log("post",req.body,req.params)
   urlDatabase[req.params.id]= {
     longURL: req.body.longURL,
-    userID: res.cookie.user_id
+    userID: req.session.user_id
   };
   console.log(urlDatabase);
   res.redirect("/urls");
@@ -190,9 +198,8 @@ app.post("/login", (req, res) => {
   if (check === undefined){
     return res.status(403).send("Not registered");
   } else if (check.email === req.body.email && bcrypt.compareSync(typedPassword, check.hashedPassword)) {
-    res.cookie("user_id", check.id)
     console.log(check.id);
-    res.cookie.user_id = check.id;
+    req.session.user_id = check.id;
     return res.redirect("urls");
   } else if (check.mail !== req.body.mail){
     res.status(400).send("No account registered. Please register");
@@ -204,7 +211,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout",(req,res) => {
-  res.clearCookie("user_id");
+  req.session.user_id = undefined;
   res.redirect("/login");
 });
 
@@ -223,8 +230,7 @@ app.post("/register",(req,res) => {
       hashedPassword: bcrypt.hashSync(req.body.password, 10),
     }
     console.log("reg", users[userRandomID]);
-    res.cookie.user_id = userRandomID;
-    console.log(res.cookie.user_id);
+    req.session.user_id = userRandomID;
     res.redirect("/urls");
   }
 //==============================================
