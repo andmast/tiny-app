@@ -197,13 +197,11 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.post("/login", (req, res) => {
   let check = findEmail(req.body.email)
-  let hashedPassword = bcrypt.hashSync(req.body.password, 10);
-  console.log("check",check,"#", hashedPassword)
-  console.log(bcrypt.compareSync(hashedPassword, check.hashedPassword))
+  let typedPassword = req.body.password
 //----------Checking password------------------
   if (check === undefined){
     return res.status(403).send("Not registered");
-  } else if (check.email === req.body.email && bcrypt.compareSync(hashedPassword, check.hashedPassword)) {
+  } else if (check.email === req.body.email && bcrypt.compareSync(typedPassword, check.hashedPassword)) {
     res.cookie("user_id", check.id)
     console.log(check.id);
     res.cookie.user_id = check.id;
@@ -223,7 +221,6 @@ app.post("/logout",(req,res) => {
 });
 
 app.post("/register",(req,res) => {
-  let hashedPassword = bcrypt.hashSync(req.body.password, 10)
   let userRandomID = generateRandomString();
   let check = findEmail(req.body.email);
 //===============Checking Register============
@@ -235,7 +232,7 @@ app.post("/register",(req,res) => {
     users[userRandomID] = {
       id: userRandomID,
       email: req.body.email,
-      hashedPassword: hashedPassword,
+      hashedPassword: bcrypt.hashSync(req.body.password, 10),
     }
     console.log("reg", users[userRandomID]);
     res.cookie.user_id = userRandomID;
