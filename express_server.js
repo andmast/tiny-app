@@ -1,31 +1,24 @@
 var express = require("express");
 var app = express();
-//---------------------------------------------
 var cookieParser = require('cookie-parser')
 app.use(cookieParser());
-//----------------------------------------
 var PORT = 8080; // default port 8080
-//----------------------------------------
 app.set("view engine", "ejs");
-//---------------------------------------
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
-
 var cookieSession = require('cookie-session')
 app.use(cookieSession({
   name: 'session',
   keys: ['key1']
 }));
-//--------------------------------------------
 app.use(function(req, res, next) {
   console.log("Headers: ", req.headers.cookie);
   console.log("Cookies: ", req.cookies.user_id);
   console.log("Signed: ", req.signedCookies);
   next()
 })
-//---------------------------------------------
 const bcrypt = require('bcrypt');
-//-------------------------------------------
+//--------------------------------------------
 
 
 //=================Functions================
@@ -43,9 +36,6 @@ function findEmail(email) {
   }
 };
 
-
-
-
 function urlsForUser(id){
   let urls = {};
   for(key in urlDatabase){
@@ -55,18 +45,6 @@ function urlsForUser(id){
   }
   return urls;
 };
-
-function notLoggedIn(cookie){
-  for(key in users){
-    let check = cookie;
-    console.log("check", check, "key", key, "cookie", cookie)
-    if(check === key){
-      return false;
-    } else {
-      return true;
-    }
-  }
-}
 
 //^^^^^^^^^^^^^^^^^Functions^^^^^^^^^^^^^^^^
 
@@ -95,7 +73,6 @@ const urlDatabase = {
 
 //------------GETS----------------------
 app.get("/", (req, res) => {
-  console.log("Coookie check", req.session.user_id)
   if (!req.session.user_id){
     res.redirect("/login");
   } else {
@@ -104,7 +81,6 @@ app.get("/", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  console.log("Coookie check", req.session.user_id)
   let templateVars = {
     user: undefined,
   }
@@ -112,7 +88,6 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  console.log("Coookie check", req.session.user_id)
   let templateVars = {
     user: undefined
   };
@@ -120,37 +95,44 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/urls", (req,res) => {
-  console.log("Coookie check/urls", req.session.user_id)
   let templateVars = {
     urls: urlsForUser(req.session.user_id),
     user: users[req.session.user_id]
   };
-
-  res.render("urls_index", templateVars)
+  if (!req.session.user_id){
+    return res.status(403).send("Login in to see urls");
+  } else {
+    res.render("urls_index", templateVars)
+  }
 });
 
 app.get("/urls/new", (req, res) => {
-  console.log("Coookie check/urls/new", req.session.user_id)
   let templateVars = {
     urls: urlDatabase,
     user: users[req.session.user_id]
   };
-  res.render("urls_new",templateVars);
+  if (!req.session.user_id){
+    res.redirect("/login")
+  } else {
+    res.render("urls_new",templateVars);
+  }
 });
 
 app.get("/urls/:id", (req, res) => {
-  console.log("Coookie check", req.session.user_id)
   let templateVars = {
     shortURL: req.params.id,
     longURL: urlDatabase[req.params.id].longURL,
     user: users[req.session.user_id]
   };
-  res.render("urls_show", templateVars);
+  if (!req.session.user_id){
+    return res.status(403).send("Login in to see url");
+  } else {
+    res.render("urls_show", templateVars);
+  }
 });
 
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL].longURL
-  console.log(longURL)
   res.redirect(longURL)
 });
 
@@ -212,7 +194,7 @@ app.post("/login", (req, res) => {
 
 app.post("/logout",(req,res) => {
   req.session.user_id = undefined;
-  res.redirect("/login");
+  res.redirect("/urls");
 });
 
 app.post("/register",(req,res) => {
