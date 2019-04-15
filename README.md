@@ -7,7 +7,7 @@ Tiny app is a full stack web application built with Node and Express that allow 
 !["Urls Index"](docs/urlsList.png)
 !["Create new short urls"](docs/createNew.png)
 !["Urls added to user database"](docs/urlsList.png)
-!["Urls added to user database"](doc/editPreviousShortUrls)
+!["Edit previous urls"](doc/editPreviousShortUrls.png)
 
 
 ## Dependencies
